@@ -2,7 +2,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 import base64
 from pathlib import Path
-import re
 
 # Page configuration
 st.set_page_config(
@@ -81,11 +80,10 @@ def get_bundled_portfolio():
     particles_js = particles_path.read_text(encoding="utf-8")
     main_js = main_js_path.read_text(encoding="utf-8")
 
-    # Inline CSS
-    html = re.sub(
-        r'<link rel="stylesheet" href="css/style\.css">',
-        f'<style>\n{css}\n</style>',
-        html
+    # Inline CSS with direct string replacement (prevents re.PatternError on backslashes)
+    html = html.replace(
+        '<link rel="stylesheet" href="css/style.css">',
+        f'<style>\n{css}\n</style>'
     )
 
     # Inline Images as Base64 Data URIs
@@ -95,16 +93,14 @@ def get_bundled_portfolio():
         rel_path = f"assets/images/{img_file.name}"
         html = html.replace(rel_path, data_uri)
 
-    # Inline JavaScript files
-    html = re.sub(
-        r'<script src="js/particles\.js"></script>',
-        f'<script>\n{particles_js}\n</script>',
-        html
+    # Inline JavaScript files with literal string replacement
+    html = html.replace(
+        '<script src="js/particles.js"></script>',
+        f'<script>\n{particles_js}\n</script>'
     )
-    html = re.sub(
-        r'<script src="js/main\.js"></script>',
-        f'<script>\n{main_js}\n</script>',
-        html
+    html = html.replace(
+        '<script src="js/main.js"></script>',
+        f'<script>\n{main_js}\n</script>'
     )
 
     return html
